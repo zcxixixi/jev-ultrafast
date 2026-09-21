@@ -147,6 +147,12 @@ def check_transparent_controls():
       <label><input type=radio style="visibility:hidden">Hidden</label>
       <label aria-hidden=true><input type=radio>Aria hidden</label>
       <input type=radio aria-label="No visible label">
+      <div style="opacity:0"><input type=radio id=ancestor></div>
+      <label for=ancestor>Label outside transparent ancestor</label>
+      <input type=radio id=empty><label for=empty style="height:24px"></label>
+      <input type=radio id=hidden_text><label for=hidden_text><span style="display:none">Hidden text</span></label>
+      <input type=radio id=transparent_text>
+      <label for=transparent_text><span style="opacity:0">Transparent text</span></label>
       <button style="opacity:0">Invisible button</button>"""
     with_browser = Browser("data:text/html," + quote(html))
     try:
@@ -170,8 +176,8 @@ def check_transparent_controls():
                               "document.body.append(cover)")
         try:
             with_browser.act(direct, page)
-        except (RuntimeError, StalePage):
-            pass
+        except StalePage as error:
+            assert str(error) == "Target changed or is covered. Observe again."
         else:
             raise AssertionError("Covered transparent radio accepted a click")
         print("PASS: transparent native controls, checked state, exclusions and occlusion")

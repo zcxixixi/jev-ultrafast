@@ -16,8 +16,10 @@ class Agent:
             raise ValueError("Supply a task")
         plan = [task]
         self.pending_text = None
-        self.browser = Browser(url)
         self.record_dir = Path(record_dir) if record_dir else None
+        if self.record_dir and any(self.record_dir.glob("*.jpg")):
+            raise ValueError("record_dir already contains recording frames; use a fresh directory")
+        self.browser = Browser(url)
         self.screenshots = screenshots or bool(record_dir)
         try:
             page = self.browser.observe(screenshot=self.screenshots)

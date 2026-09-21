@@ -87,17 +87,19 @@ function render() {
     blocked: "Stopped · no supported next action",
   };
   $("status").textContent = labels[state.status] || state.status;
+  $("empty").hidden = Boolean(page);
+  $("screenshot-notice").hidden = !page || Boolean(page.screenshot);
+  $("screenshot-notice").textContent = page && !page.screenshot
+    ? page.screenshot_error || "Screenshot unavailable; page data is available."
+    : "";
+  $("screenshot").hidden = !page?.screenshot;
+  if (page?.screenshot) $("screenshot").src = `data:image/jpeg;base64,${page.screenshot}`;
+  else $("screenshot").removeAttribute("src");
   if (!page) {
+    $("targets").hidden = true;
     controls();
     return;
   }
-  $("empty").hidden = Boolean(page.screenshot);
-  if (!page.screenshot) {
-    $("empty").textContent = page.screenshot_error || "Screenshot unavailable; page data is available.";
-  }
-  $("screenshot").hidden = !page.screenshot;
-  if (page.screenshot) $("screenshot").src = `data:image/jpeg;base64,${page.screenshot}`;
-  else $("screenshot").removeAttribute("src");
   $("url").textContent = page.url;
   $("page-title").textContent = page.title;
   $("action-count").textContent = `${state.elements.length} elements`;
